@@ -16,6 +16,20 @@ services:
       APACHE_IP_BINDING: 0.0.0.0
       SKIP_DOMAIN_VALIDATION: true
 
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=your-cloudflared-tunnel-token
+  ubuntu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ubuntu
+    volumes:
+      - ${CLOUDFLARED_CONFIG_DIR}:~/.cloudflared
+
 volumes:
   nextcloud_aio_mastercontainer:
     name: nextcloud_aio_mastercontainer
