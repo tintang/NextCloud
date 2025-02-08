@@ -9,6 +9,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro # May be changed on macOS, Windows or docker rootless. See the applicable documentation. If adjusting, don't forget to also set 'WATCHTOWER_DOCKER_SOCKET_PATH'!
     network_mode: bridge # add to the same network as docker run would do
     ports:
+      - 80:80
       - 8080:8080
     environment:
       # AIO_DISABLE_BACKUP_SECTION: false # Setting this to true allows to hide the backup section in the AIO interface. See https://github.com/nextcloud/all-in-one#how-to-disable-the-backup-section
@@ -35,35 +36,6 @@ services:
       # WATCHTOWER_DOCKER_SOCKET_PATH: /var/run/docker.sock # Needs to be specified if the docker socket on the host is not located in the default '/var/run/docker.sock'. Otherwise mastercontainer updates will fail. For macos it needs to be '/var/run/docker.sock'
     # security_opt: ["label:disable"] # Is needed when using SELinux
 
-#   # Optional: Caddy reverse proxy. See https://github.com/nextcloud/all-in-one/discussions/575
-#   # Alternatively, use Tailscale if you don't have a domain yet. See https://github.com/nextcloud/all-in-one/discussions/5439
-#   # Hint: You need to uncomment APACHE_PORT: 11000 above, adjust cloud.example.com to your domain and uncomment the necessary docker volumes at the bottom of this file in order to make it work
-#   # You can find further examples here: https://github.com/nextcloud/all-in-one/discussions/588
-  caddy:
-   image: caddy:alpine
-   restart: always
-   container_name: caddy
-   volumes:
-     - caddy_certs:/certs
-     - caddy_config:/config
-     - caddy_data:/data
-     - caddy_sites:/srv
-   network_mode: "host"
-   configs:
-     - source: Caddyfile
-       target: /etc/caddy/Caddyfile
-configs:
- Caddyfile:
-   content: |
-     # Adjust cloud.example.com to your domain below
-     https://nextcloud.tintang.cc:443 {
-       reverse_proxy localhost:11000
-     }
-
-volumes: # If you want to store the data on a different drive, see https://github.com/nextcloud/all-in-one#how-to-store-the-filesinstallation-on-a-separate-drive
+volumes:
   nextcloud_aio_mastercontainer:
     name: nextcloud_aio_mastercontainer # This line is not allowed to be changed as otherwise the built-in backup solution will not work
-  caddy_certs:
-  caddy_config:
-  caddy_data:
-  caddy_sites:
