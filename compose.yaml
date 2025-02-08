@@ -29,6 +29,7 @@ services:
       - ./.cloudflared:/usr/local/etc/cloudflared
       #Add tunnel config file to the container
       - ~/.cloudflared:/home/.cloudflared:ro
+      - /mnt/smb_immich_backups/nextcloud_backups:/mnt/nextcloud_backups
 
 volumes:
   nextcloud_aio_mastercontainer:
