@@ -27,6 +27,8 @@ services:
     command: tunnel run nextcloud
     volumes:
       - ./.cloudflared:/home/nonroot/.cloudflared
+      #Add tunnel config file to the container
+      - ~/.cloudflared:/home/nonroot/.cloudflared:ro
 
 volumes:
   nextcloud_aio_mastercontainer:
