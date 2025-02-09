@@ -9,13 +9,13 @@ services:
       - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - "81:80"      # Exposing internal port 80 on host port 81 (optional if you only want tunnel access)
+      - "80:80"      # Exposing internal port 80 on host port 81 (optional if you only want tunnel access)
       - "8080:8080"
     environment:
       APACHE_PORT: 11000
       APACHE_IP_BINDING: 0.0.0.0
-      SKIP_DOMAIN_VALIDATION: true
       APACHE_ADDITIONAL_NETWORK: ""
+      SKIP_DOMAIN_VALIDATION: true
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -27,10 +27,13 @@ services:
     command: tunnel run nextcloud
     volumes:
       - ./.cloudflared:/usr/local/etc/cloudflared
-      #Add tunnel config file to the container
-      - ~/.cloudflared:/home/.cloudflared:ro
-      - /mnt/smb_immich_backups/nextcloud_backups:/mnt/nextcloud_backups
+    networks:
+      - nextcloud-aio
 
 volumes:
   nextcloud_aio_mastercontainer:
     name: nextcloud_aio_mastercontainer
+
+networks:
+  nextcloud-aio:
+    external: true
