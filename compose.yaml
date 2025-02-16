@@ -17,19 +17,29 @@ services:
       APACHE_ADDITIONAL_NETWORK: ""
       SKIP_DOMAIN_VALIDATION: true
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
-    restart: unless-stopped
+  tailscale:
+    image: tailscale/tailscale:stable
+    container_name: tailscale
+    cap_add:
+      - NET_ADMIN
     depends_on:
       - nextcloud
-    # The command below will run the tunnel named "nextcloud" (see steps below)
-    command: tunnel run nextcloud
+    # We store the Tailscale state so we don't have to re-auth every time.
     volumes:
-      - ./.cloudflared:/usr/local/etc/cloudflared
-    networks:
-      - nextcloud-aio
-
+      - ./tailscale/state:/var/lib/tailscale
+    network_mode: "container:nextcloud"
+    command: >
+      sh -c "
+        # 1) Start tailscaled in userspace mode in the background
+        tailscaled --tun=userspace-networking --socks5-server=localhost:1055 &
+        # 2) Give it a few seconds to start
+        sleep 5
+        tailscale set --hostname=nextcloud 
+        # 3) Bring Tailscale up, using environment vars for authkey & hostname
+        tailscale up
+        # 5) NEW SYNTAX for 'funnel'
+        tailscale funnel --bg http://127.0.0.1:80    
+        tail -f /dev/null
 volumes:
   nextcloud_aio_mastercontainer:
     name: nextcloud_aio_mastercontainer
