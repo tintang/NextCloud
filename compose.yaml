@@ -23,7 +23,7 @@ services:
     cap_add:
       - NET_ADMIN
     depends_on:
-      - nextcloud
+      - nextcloud-aio-mastercontainer
     # We store the Tailscale state so we don't have to re-auth every time.
     volumes:
       - ./tailscale/state:/var/lib/tailscale
