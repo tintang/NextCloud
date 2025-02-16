@@ -19,7 +19,7 @@ services:
 
   tailscale:
     image: tailscale/tailscale:stable
-    container_name: tailscale
+    container_name: nextcloud-tailscale
     cap_add:
       - NET_ADMIN
     depends_on:
