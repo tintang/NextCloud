@@ -1,2 +1,4 @@
 .env
 .idea
+.cloudflared
+id_ed25519
