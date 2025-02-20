@@ -24,19 +24,17 @@ services:
       - NET_ADMIN
     volumes:
       - ./tailscale/state:/var/lib/tailscale
+      - ./tailscale.bash:/usr/local/bin/restart_watchdog.sh
     network_mode: "container:nextcloud-aio-apache"
     command: >
-      sh -c "
-        tailscale down
-        tailscale funnel reset
-        tailscaled --tun=userspace-networking --socks5-server=localhost:1055 &
-        sleep 5
-        tailscale set --hostname=nextcloud
-        tailscale up
-        sleep 5
-        tailscale funnel --bg http://127.0.0.1:11000  
-        tail -f /dev/null
-      "
+      sh -c "sh /usr/local/bin/restart_watchdog.sh "
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://nextcloud.tail3092be.ts.net/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: always
 volumes:
   nextcloud_aio_mastercontainer:
     name: nextcloud_aio_mastercontainer
