@@ -8,6 +8,7 @@ services:
     volumes:
       - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ~/.ssh:/root/.ssh:ro
     ports:
       - "80:80"      # Exposing internal port 80 on host port 81 (optional if you only want tunnel access)
       - "8080:8080"
@@ -27,13 +28,7 @@ services:
       - ./tailscale.bash:/usr/local/bin/restart_watchdog.sh
     network_mode: "container:nextcloud-aio-apache"
     command: >
-      sh -c "sh /usr/local/bin/restart_watchdog.sh "
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://nextcloud.tail3092be.ts.net/login"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+      sh -c "sh /usr/local/bin/restart_watchdog.sh"
     restart: always
 volumes:
   nextcloud_aio_mastercontainer:
